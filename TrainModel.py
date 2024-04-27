@@ -1,70 +1,56 @@
 import numpy as np
-import imutils
-import sys
 import cv2
 import os
-from keras.utils.np_utils import to_categorical
-from keras.models import model_from_json
-from keras.layers import MaxPooling2D
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D
+from tensorflow.keras.utils import to_categorical
 from keras.models import Sequential 
+from keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense
 
+# Load images and labels
 images = []
 image_labels  = []
 directory = 'dataset'
 list_of_files = os.listdir(directory)
-index = 0
 for file in list_of_files:
-    subfiles = os.listdir(directory+'/'+file)
+    subfiles = os.listdir(os.path.join(directory, file))
     for sub in subfiles:
-        path = directory+'/'+file+'/'+sub
+        path = os.path.join(directory, file, sub)
         img = cv2.imread(path)
-        #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = cv2.resize(img, (32,32))
-        im2arr = np.array(img)
-        im2arr = im2arr.reshape(32,32,3)
-        images.append(im2arr)
-        image_labels.append(file)
-    print(file)    
+        img = cv2.resize(img, (32, 32))
+        images.append(img)
+        image_labels.append(int(file))  # Assuming labels are class indices
+    print(file)
 
-X = np.asarray(images)
-Y = np.asarray(image_labels)
-Y = to_categorical(Y)
-img = X[20].reshape(32,32,3)
-cv2.imshow('ff',cv2.resize(img,(250,250)))
-cv2.waitKey(0)
-print("shape == "+str(X.shape))
-print("shape == "+str(Y.shape))
-print(Y)
-X = X.astype('float32')
-X = X/255
+X = np.array(images)
+Y = np.array(image_labels)
 
-np.save("img_data.txt",X)
-np.save("img_label.txt",Y)
+# Normalize pixel values
+X = X.astype('float32') / 255.0
 
-X = np.load('img_data.txt.npy')
-Y = np.load('img_label.txt.npy')
-print(Y)
-img = X[20].reshape(32,32,3)
-cv2.imshow('ff',cv2.resize(img,(250,250)))
-cv2.waitKey(0)
+# Convert labels to one-hot encoding
+Y_one_hot = to_categorical(Y, num_classes=5)  # Assuming 5 classes
 
-classifier = Sequential() #alexnet transfer learning code here
-classifier.add(Convolution2D(32, 3, 3, input_shape = (32, 32, 3), activation = 'relu'))
-classifier.add(MaxPooling2D(pool_size = (2, 2)))
-classifier.add(Convolution2D(32, 3, 3, activation = 'relu'))
-classifier.add(MaxPooling2D(pool_size = (2, 2)))
+# Define the model
+classifier = Sequential()
+classifier.add(Convolution2D(32, 3, 3, input_shape=(32, 32, 3), activation='relu', padding='same'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+
+classifier.add(Convolution2D(64, 3, 3, activation='relu', padding='same'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+
 classifier.add(Flatten())
-classifier.add(Dense(output_dim = 128, activation = 'relu'))
-classifier.add(Dense(output_dim = 5, activation = 'softmax'))
-classifier.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
-classifier.fit(X, Y, batch_size=32, epochs=50)
-classifier.save_weights('model/train.h5')            
+classifier.add(Dense(units=128, activation='relu'))
+classifier.add(Dense(units=5, activation='softmax'))  # Assuming 5 classes
+
+# Compile the model
+classifier.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Train the model
+classifier.fit(X, Y_one_hot, batch_size=32, epochs=50)
+
+# Save the model
+classifier.save_weights('modeltrain.weights.h5')            
 model_json = classifier.to_json()
 with open("model/train.json", "w") as json_file:
     json_file.write(model_json)
+
 print(classifier.summary())
-
-
-

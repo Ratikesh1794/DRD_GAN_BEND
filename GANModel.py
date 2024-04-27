@@ -13,27 +13,27 @@ import cv2
 
 # function to generate discriminator model
 def define_discriminator(in_shape=(32,32,3)):
-	model = Sequential()
-	# normal
-	model.add(Conv2D(64, (3,3), padding='same', input_shape=in_shape))
-	model.add(LeakyReLU(alpha=0.2))
-	# downsample
-	model.add(Conv2D(128, (3,3), strides=(2,2), padding='same'))
-	model.add(LeakyReLU(alpha=0.2))
-	# downsample
-	model.add(Conv2D(128, (3,3), strides=(2,2), padding='same'))
-	model.add(LeakyReLU(alpha=0.2))
-	# downsample
-	model.add(Conv2D(256, (3,3), strides=(2,2), padding='same'))
-	model.add(LeakyReLU(alpha=0.2))
-	# classifier
-	model.add(Flatten())
-	model.add(Dropout(0.4))
-	model.add(Dense(1, activation='sigmoid'))
-	# compile model
-	opt = Adam(lr=0.0002, beta_1=0.5)
-	model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
-	return model
+    model = Sequential()
+    # normal
+    model.add(Conv2D(64, (3,3), padding='same', input_shape=in_shape))
+    model.add(LeakyReLU(alpha=0.2))
+    # downsample
+    model.add(Conv2D(128, (3,3), strides=(2,2), padding='same'))
+    model.add(LeakyReLU(alpha=0.2))
+    # downsample
+    model.add(Conv2D(128, (3,3), strides=(2,2), padding='same'))
+    model.add(LeakyReLU(alpha=0.2))
+    # downsample
+    model.add(Conv2D(256, (3,3), strides=(2,2), padding='same'))
+    model.add(LeakyReLU(alpha=0.2))
+    # classifier
+    model.add(Flatten())
+    model.add(Dropout(0.4))
+    model.add(Dense(1, activation='sigmoid'))
+    # compile model
+    opt = Adam(learning_rate=0.0002, beta_1=0.5)  # Use learning_rate instead of lr
+    model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
+    return model
 
 # function to generate standalone generator model
 def define_generator(latent_dim):
@@ -58,18 +58,18 @@ def define_generator(latent_dim):
 
 # define the combined generator and discriminator model, for updating the generator
 def define_gan(g_model, d_model):
-	# make weights in the discriminator not trainable
-	d_model.trainable = False
-	# connect them
-	model = Sequential()
-	# add generator
-	model.add(g_model)
-	# add the discriminator
-	model.add(d_model)
-	# compile model
-	opt = Adam(lr=0.0002, beta_1=0.5)
-	model.compile(loss='binary_crossentropy', optimizer=opt)
-	return model
+    # make weights in the discriminator not trainable
+    d_model.trainable = False
+    # connect them
+    model = Sequential()
+    # add generator
+    model.add(g_model)
+    # add the discriminator
+    model.add(d_model)
+    # compile model
+    opt = Adam(learning_rate=0.0002, beta_1=0.5)  # Use learning_rate instead of lr
+    model.compile(loss='binary_crossentropy', optimizer=opt)
+    return model
 
 # load and prepare cifar10 training images
 def load_real_samples():
@@ -168,8 +168,8 @@ def train(g_model, d_model, gan_model, dataset, latent_dim, n_epochs=100, n_batc
 			# update the generator via the discriminator's error
 			g_loss = gan_model.train_on_batch(X_gan, y_gan)
 			# summarize loss on this batch
-			print('>%d, %d/%d, d1=%.3f, d2=%.3f g=%.3f' %
-				(i+1, j+1, bat_per_epo, d_loss1, d_loss2, g_loss))
+			# print(type(d_loss1), type(d_loss2), type(g_loss))
+			# print(f'>{i+1}, {j+1}/{str(bat_per_epo)}, d1={d_loss1:.3f}, d2={d_loss2:.3f} g={g_loss:.3f}')
 		# evaluate the model performance, sometimes
 		if (i+1) % 10 == 0:
 			summarize_performance(i, g_model, d_model, dataset, latent_dim)

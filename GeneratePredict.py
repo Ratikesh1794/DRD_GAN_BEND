@@ -33,8 +33,7 @@ with open('model/train.json', "r") as json_file:
     loaded_model_json = json_file.read()
     loaded_model = model_from_json(loaded_model_json)
 
-loaded_model.load_weights("model/train.h5")
-loaded_model._make_predict_function()   
+loaded_model.load_weights("modeltrain.weights.h5")
 print(loaded_model.summary())
 '''
 def generate_latent_points(latent_dim, n_samples):
@@ -78,7 +77,7 @@ def generate_latent_points(latent_dim, n_samples):
 
 arr = ['010','020','030','040','050','060','070','080','090','100']
 for i in range(len(arr)):
-    model = load_model('model/generator_model_080.h5')
+    model = load_model('model/generator_model_040.h5')
     latent_points = generate_latent_points(200, 200)
     X = model.predict(latent_points)
     index = randrange(200)

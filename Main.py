@@ -46,7 +46,7 @@ def create_plot(examples, n):
 
 def ganModel():
     global gan_model
-    gan_model = load_model('model/generator_model_080.h5')
+    gan_model = load_model('model/generator_model_040.h5')
     latent_points = generate_latent_points(200, 200)
     X = gan_model.predict(latent_points)
     text.insert(END,'GAN model generated\n')
@@ -60,8 +60,7 @@ def predictModel():
         loaded_model_json = json_file.read()
         predict_model = model_from_json(loaded_model_json)
 
-    predict_model.load_weights("model/train.h5")
-    predict_model._make_predict_function()
+    predict_model.load_weights("modeltrain.weights.h5")
     print(predict_model.summary())
     text.insert(END,'See black console to view model summary')
 
