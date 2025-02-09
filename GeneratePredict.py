@@ -1,22 +1,23 @@
 # example of generating an image for a specific point in the latent space
-from keras.models import load_model
+from keras._tf_keras.keras.models import load_model
 from numpy import asarray
 import cv2
 from matplotlib import pyplot
 from random import randrange
 from numpy.random import randn
-from keras.models import Sequential
-from keras.layers import Convolution2D
-from keras.layers import MaxPooling2D
-from keras.layers import Flatten
-from keras.layers import Dense,Activation,BatchNormalization
-from keras.models import model_from_json
+from keras._tf_keras.keras.models import Sequential
+
+from keras._tf_keras.keras.layers import Convolution2D
+from keras._tf_keras.keras.layers import MaxPooling2D
+from keras._tf_keras.keras.layers import Flatten
+from keras._tf_keras.keras.layers import Dense,Activation,BatchNormalization
+from keras._tf_keras.keras.models import model_from_json
 import numpy as np
 import cv2
 from imutils import paths
 import imutils
 import matplotlib.pyplot as plt
-from keras.preprocessing import image
+from keras._tf_keras.keras.preprocessing import image
 
 # load model
 '''

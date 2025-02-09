@@ -1,9 +1,11 @@
 import numpy as np
 import cv2
 import os
-from tensorflow.keras.utils import to_categorical
-from keras.models import Sequential 
-from keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense
+from keras._tf_keras.keras.utils import to_categorical
+from keras._tf_keras.keras.models import Sequential 
+from keras._tf_keras.keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense
+
+
 
 # Load images and labels
 images = []

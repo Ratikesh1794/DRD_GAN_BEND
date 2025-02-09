@@ -4,12 +4,13 @@ from numpy import ones
 from numpy import vstack
 from numpy.random import randn
 from numpy.random import randint
-from keras.optimizers import Adam
-from keras.models import Sequential
-from keras.layers import Dense,Reshape,Flatten,Conv2D,Conv2DTranspose,LeakyReLU,Dropout
+from keras._tf_keras.keras.optimizers import Adam
+from keras._tf_keras.keras.models import Sequential
+from keras._tf_keras.keras.layers import Dense,Reshape,Flatten,Conv2D,Conv2DTranspose,LeakyReLU,Dropout
 from matplotlib import pyplot
 import numpy as np
 import cv2
+
 
 # function to generate discriminator model
 def define_discriminator(in_shape=(32,32,3)):

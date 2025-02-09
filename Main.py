@@ -8,11 +8,11 @@ import numpy as np
 import pandas as pd
 from tkinter import simpledialog
 from tkinter import filedialog
-from keras.models import model_from_json
+from keras._tf_keras.keras.models import model_from_json
 from random import randrange
 from numpy.random import randn
 import cv2
-from keras.models import load_model
+from keras._tf_keras.keras.models import load_model
 from matplotlib import pyplot
 
 main = tkinter.Tk()
