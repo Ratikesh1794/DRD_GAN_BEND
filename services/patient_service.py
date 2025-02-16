@@ -24,4 +24,21 @@ class PatientService:
         
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.patient_model is not None:
-            await self.patient_model.close() 
+            await self.patient_model.close()
+        
+    async def update_image_url(self, patient_id: str, image_url: str):
+        try:
+            if self.patient_model.collection is None:
+                await self.initialize()
+            
+            result = await self.patient_model.collection.update_one(
+                {"patient_id": patient_id},
+                {"$set": {"image_url": image_url}}
+            )
+            
+            if result.modified_count == 0:
+                raise Exception("Patient not found or image URL not updated")
+            
+            return True
+        except Exception as e:
+            raise Exception(f"Database error: {str(e)}") 

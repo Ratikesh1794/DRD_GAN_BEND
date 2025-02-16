@@ -27,6 +27,9 @@ class Patient(BaseModel):
     # Metadata
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    
+    #image path
+    image_url: Optional[str] = None
 
 # Database Model
 class PatientModel:

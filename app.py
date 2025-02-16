@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from config.database import DatabaseConfig
 from base import configure_routes
 from asgiref.wsgi import WsgiToAsgi
+from config.cloudinary_config import configure_cloudinary
 
 # Load environment variables
 load_dotenv()
@@ -11,6 +12,7 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
     CORS(app)
+    configure_cloudinary()
     return app
 
 # Create app instance

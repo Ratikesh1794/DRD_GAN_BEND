@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from routes.patient import patient_bp
+from routes.image import image_bp
 from config.database import DatabaseConfig
 from utils import get_or_create_eventloop, run_async
 
@@ -37,6 +38,9 @@ def configure_routes(app):
 
     # Register patient blueprint
     app.register_blueprint(patient_bp)
+
+    # Register image blueprint
+    app.register_blueprint(image_bp)
 
     # Root route
     @app.route('/')
