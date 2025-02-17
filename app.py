@@ -6,6 +6,7 @@ from base import configure_routes
 from asgiref.wsgi import WsgiToAsgi
 from config.cloudinary_config import configure_cloudinary
 from utils import run_async
+import os
 
 # Load environment variables
 load_dotenv()
@@ -39,4 +40,5 @@ app = create_app()
 asgi_app = WsgiToAsgi(app)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
