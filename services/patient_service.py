@@ -1,4 +1,5 @@
 from models.patient_model import Patient, PatientModel
+from datetime import datetime
 
 
 class PatientService:
@@ -38,6 +39,29 @@ class PatientService:
             
             if result.modified_count == 0:
                 raise Exception("Patient not found or image URL not updated")
+            
+            return True
+        except Exception as e:
+            raise Exception(f"Database error: {str(e)}")
+
+    async def update_prediction(self, patient_id: str, prediction_result: dict):
+        try:
+            if self.patient_model.collection is None:
+                await self.initialize()
+            
+            result = await self.patient_model.collection.update_one(
+                {"patient_id": patient_id},
+                {"$set": {
+                    "dr_detection_result": prediction_result['dr_status'],
+                    "severity_level": prediction_result['severity_level'],
+                    "prediction_confidence": prediction_result['confidence'],
+                    "detailed_predictions": prediction_result['predictions'],
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            
+            if result.modified_count == 0:
+                raise Exception("Patient not found or prediction not updated")
             
             return True
         except Exception as e:
