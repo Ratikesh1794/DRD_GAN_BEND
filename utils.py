@@ -21,5 +21,6 @@ def run_async(coro):
 def async_handler(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
-        return run_async(f(*args, **kwargs))
+        loop = get_or_create_eventloop()
+        return loop.run_until_complete(f(*args, **kwargs))
     return wrapped 

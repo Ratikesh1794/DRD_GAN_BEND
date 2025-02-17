@@ -7,12 +7,6 @@ from utils import get_or_create_eventloop, run_async
 def configure_routes(app):
     """Configure all routes and database for the application"""
     
-    # Initialize database connection
-    db_config = DatabaseConfig()
-    
-    # Initialize database using the global event loop
-    app.db = run_async(db_config.connect())
-    
     # Register error handlers
     @app.errorhandler(404)
     def not_found_error(error):

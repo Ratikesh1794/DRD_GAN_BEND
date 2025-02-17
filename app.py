@@ -5,6 +5,7 @@ from config.database import DatabaseConfig
 from base import configure_routes
 from asgiref.wsgi import WsgiToAsgi
 from config.cloudinary_config import configure_cloudinary
+from utils import run_async
 
 # Load environment variables
 load_dotenv()
@@ -18,23 +19,24 @@ def create_app():
             "allow_headers": ["Content-Type", "Authorization"]
         }
     })
+    
+    # Configure Cloudinary
     configure_cloudinary()
+    
+    # Initialize database
+    db_config = DatabaseConfig()
+    app.db = run_async(db_config.connect())
+    
+    # Configure routes
+    configure_routes(app)
+    
     return app
 
 # Create app instance
 app = create_app()
 
-# Configure routes and database
-configure_routes(app)
-
 # Create ASGI app
 asgi_app = WsgiToAsgi(app)
 
 if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run(
-        asgi_app,
-        host='0.0.0.0',
-        port=5000,
-        workers=4
-    )
+    app.run(debug=True)
