@@ -83,4 +83,24 @@ class PatientService:
             
             return prediction_data
         except Exception as e:
+            raise Exception(f"Database error: {str(e)}")
+
+    async def get_patient_details(self, patient_id: str):
+        try:
+            if self.patient_model.collection is None:
+                await self.initialize()
+            
+            patient = await self.patient_model.collection.find_one(
+                {"patient_id": patient_id}
+            )
+            
+            if not patient:
+                raise Exception("Patient not found")
+            
+            # Convert ObjectId to string if present
+            if '_id' in patient:
+                patient['_id'] = str(patient['_id'])
+            
+            return patient
+        except Exception as e:
             raise Exception(f"Database error: {str(e)}") 
