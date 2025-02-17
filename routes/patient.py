@@ -34,3 +34,22 @@ async def add_patient():
             'message': str(e),
             'error_type': 'ServerError'
         }), 500
+
+@patient_bp.route('/get-prediction/<patient_id>', methods=['GET'])
+@async_handler
+async def get_patient_prediction(patient_id):
+    try:
+        async with PatientService(current_app.db) as service:
+            prediction_data = await service.get_prediction(patient_id)
+        
+        return jsonify({
+            'status': 'success',
+            'prediction_data': prediction_data
+        }), 200
+            
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e),
+            'error_type': 'ServerError'
+        }), 500
