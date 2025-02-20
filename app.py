@@ -49,5 +49,5 @@ app.include_router(image_router)
 app.include_router(report_router)
 
 if __name__ == "__main__":
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 8000))
     uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)
