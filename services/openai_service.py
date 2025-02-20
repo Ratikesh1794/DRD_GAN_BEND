@@ -32,7 +32,8 @@ class OpenAIService:
             """
 
             prompt = f"""
-            Based on the following patient information and examination results, generate a comprehensive medical report:
+            Based on the following patient information and examination results, generate a comprehensive medical report.
+            Ensure each section is clearly separated by line breaks and follows a consistent, formal medical format.
 
             {patient_info}
 
@@ -42,34 +43,119 @@ class OpenAIService:
             - Confidence: {confidence:.1f}%
             - Detailed Predictions: {detailed_predictions}
 
-            Please provide a structured medical report with the following sections:
+            Generate a structured medical report with the following specific sections:
 
             1. Patient Medical Assessment
-            Provide a concise summary of the patient's current medical status, including visual acuity and relevant health metrics.
+            - Current visual acuity analysis
+            - Vital signs evaluation (blood pressure, blood sugar)
+            - Reported vision problems and symptoms
+            - Overall health status assessment
 
             2. DR Status Analysis
-            Analyze the detected diabetic retinopathy status and its implications.
+            - Detailed interpretation of DR detection results
+            - Analysis of severity level and its clinical significance
+            - Confidence level interpretation
+            - Correlation with patient's symptoms
 
             3. Classification Details
-            Detail the specific classification findings and their clinical significance.
+            - Specific findings from the retinal examination
+            - Presence of DR-related features
+            - Quantitative analysis of detected abnormalities
+            - Comparison with standard classification criteria
 
             4. Vulnerable Areas Analysis
-            Identify and describe areas of concern in the retinal examination.
+            - Identification of specific affected retinal regions
+            - Description of observed pathological changes
+            - Assessment of macular involvement
+            - Peripheral retina status
 
             5. Risk Assessment
-            Evaluate the patient's risk factors and potential progression of the condition.
+            - Current risk level evaluation
+            - Contributing systemic factors
+            - Progression risk factors
+            - Complications risk analysis
 
             6. Recommendations
-            Provide specific medical recommendations and lifestyle modifications.
+            - Immediate medical interventions required
+            - Lifestyle modifications needed
+            - Blood sugar management guidelines
+            - Vision protection measures
 
             7. Follow-up Plan
-            Outline a clear follow-up schedule and monitoring plan.
+            - Specific timeline for next examination
+            - Required diagnostic tests
+            - Monitoring schedule
+            - Referral recommendations if needed
 
-            Format each section with clear headings and professional medical terminology. Maintain a formal, clinical tone throughout the report.
+            Important guidelines:
+            - Use clear, professional medical terminology
+            - Maintain a formal clinical tone
+            - Provide specific, actionable information
+            - Ensure each section is distinct and comprehensive
+            - Include quantitative data where available
+            - Avoid any special characters or formatting markers
+            
+            Eg :
+            Wrong format:
+            {
+                "report": {
+                    "blood_pressure": "120/80",
+                    "blood_sugar_fasting": 95.5,
+                    "classification_details": "Patient Name: John Doe\nDOB: 1990-01-01\nGender: Male",
+                    "confidence": 0.8788774013519287,
+                    "created_at": "Thu, 20 Feb 2025 19:18:06 GMT",
+                    "date_of_birth": "Mon, 01 Jan 1990 00:00:00 GMT",
+                    "dr_status": "Positive",
+                    "dr_status_analysis": "**Patient Medical Assessment**",
+                    "follow_up_plan": "**Classification Details**",
+                    "gender": "male",
+                    "image_url": "https://res.cloudinary.com/dolurenna/image/upload/v1740079032/retinal_images/patient_P12345_test.jpg",
+                    "patient_id": "P12345",
+                    "patient_medical_assessment": "**Medical Report**",
+                    "patient_name": "John Doe",
+                    "recommendations": "Retinal examination revealed a positive Diabetic Retinopathy (DR) status. The severity level of DR is graded as severe. The confidence level of the DR diagnosis is 0.9%, indicating a high degree of certainty in the diagnosis. These findings correlate with the patient's main symptom of blurred vision, which is a common manifestation of DR.",
+                    "report_id": "90a547f0-f84b-4f43-841e-2d9bdae3345f",
+                    "risk_assessment": "**DR Status Analysis**",
+                    "severity_level": "Severe DR",
+                    "vision_problems": "Blurred vision",
+                    "visual_acuity_left": 0.7,
+                    "visual_acuity_right": 0.8,
+                    "vulnerable_areas_analysis": "John Doe presents with the primary complaint of blurred vision. His visual acuity measurement is 0.8 for the right eye and 0.7 for the left eye, indicating mild vision impairment. Vital signs show a fasting blood sugar of 95.5, which is within a healthy range. Blood pressure measurement is 120/80 mmHg, classified as normal. Overall, apart from the reported vision problem, the patient's general health status appears stable."
+                },
+                "status": "success"
+            }
+            Correct Format:
+            {
+                "report": {
+                    "blood_pressure": "120/80",
+                    "blood_sugar_fasting": 95.5,
+                    "classification_details": "Patient Name: John Doe\nDOB: 1990-01-01\nGender: Male",
+                    "confidence": 0.8788774013519287,
+                    "created_at": "Thu, 20 Feb 2025 19:18:06 GMT",
+                    "date_of_birth": "Mon, 01 Jan 1990 00:00:00 GMT",
+                    "dr_status": "Positive",
+                    "dr_status_analysis": "Patient Medical Assessment",
+                    "follow_up_plan": "Classification Details",
+                    "gender": "male",
+                    "image_url": "https://res.cloudinary.com/dolurenna/image/upload/v1740079032/retinal_images/patient_P12345_test.jpg",
+                    "patient_id": "P12345",
+                    "patient_medical_assessment": "Medical Report",
+                    "patient_name": "John Doe",
+                    "recommendations": "Retinal examination revealed a positive Diabetic Retinopathy (DR) status. The severity level of DR is graded as severe. The confidence level of the DR diagnosis is 0.9%, indicating a high degree of certainty in the diagnosis. These findings correlate with the patient's main symptom of blurred vision, which is a common manifestation of DR.",
+                    "report_id": "90a547f0-f84b-4f43-841e-2d9bdae3345f",
+                    "risk_assessment": "DR Status Analysis",
+                    "severity_level": "Severe DR",
+                    "vision_problems": "Blurred vision",
+                    "visual_acuity_left": 0.7,
+                    "visual_acuity_right": 0.8,
+                    "vulnerable_areas_analysis": "John Doe presents with the primary complaint of blurred vision. His visual acuity measurement is 0.8 for the right eye and 0.7 for the left eye, indicating mild vision impairment. Vital signs show a fasting blood sugar of 95.5, which is within a healthy range. Blood pressure measurement is 120/80 mmHg, classified as normal. Overall, apart from the reported vision problem, the patient's general health status appears stable."
+                },
+                "status": "success"
+            }
             """
 
             response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-4",
                 messages=[
                     {
                         "role": "user",

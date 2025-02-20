@@ -7,6 +7,7 @@ from keras._tf_keras.keras.models import load_model
 import io
 from models.architecture import Generator
 from services.model_service import ModelService
+from keras._tf_keras.keras.preprocessing.image import load_img, img_to_array
 
 class PredictionService:
     def __init__(self):
@@ -57,14 +58,9 @@ class PredictionService:
         Predict DR grade from a retinal image
         """
         try:
-            # Load and process image
-            image = Image.open(image_path).convert('RGB')
-            enhanced_image = await self.enhance_image(image)
-            
-            # Prepare for CNN
-            img_array = np.array(enhanced_image)
-            img_array = cv2.resize(img_array, (224, 224))
-            img_array = img_array / 255.0
+            # Load and preprocess image
+            image = load_img(image_path, target_size=(224, 224))
+            img_array = img_to_array(image) / 255.0
             img_array = np.expand_dims(img_array, axis=0)
             
             # Load CNN model from S3
