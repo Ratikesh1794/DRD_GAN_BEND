@@ -1,55 +1,67 @@
-from flask import Blueprint, request, jsonify, current_app
+from fastapi import APIRouter, Depends, HTTPException
 from models.patient_model import Patient
 from services.patient_service import PatientService
-from utils import async_handler
+from typing import Dict, Any
+from fastapi import Request
 
-# Remove url_prefix as we'll handle it in the main route registration
-patient_bp = Blueprint('patient', __name__)
+# Create router
+patient_router = APIRouter(
+    prefix="/patient",
+    tags=["patient"]
+)
 
-@patient_bp.route('/create-patient', methods=['POST'])
-@async_handler
-async def add_patient():
+# Get database from app state
+async def get_db(request: Request):
+    return request.app.state.db
+
+@patient_router.post("/create-patient", status_code=201)
+async def add_patient(patient_data: Patient, db: Any = Depends(get_db)):
     try:
-        # Validate request data using Pydantic
-        patient_data = Patient(**request.json)
-        
-        async with PatientService(current_app.db) as service:
+        async with PatientService(db) as service:
             patient_id = await service.create_patient(patient_data)
         
-        return jsonify({
+        return {
             'status': 'success',
             'message': 'Patient added successfully',
             'patient_id': patient_id
-        }), 201
+        }
             
     except ValueError as e:
-        return jsonify({
-            'status': 'error',
-            'message': str(e),
-            'error_type': 'ValidationError'
-        }), 400
+        raise HTTPException(
+            status_code=400,
+            detail={
+                'status': 'error',
+                'message': str(e),
+                'error_type': 'ValidationError'
+            }
+        )
     except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': str(e),
-            'error_type': 'ServerError'
-        }), 500
+        raise HTTPException(
+            status_code=500,
+            detail={
+                'status': 'error',
+                'message': str(e),
+                'error_type': 'ServerError'
+            }
+        )
 
-@patient_bp.route('/get-prediction/<patient_id>', methods=['GET'])
-@async_handler
-async def get_patient_prediction(patient_id):
+@patient_router.get("/get-prediction/{patient_id}")
+async def get_patient_prediction(patient_id: str, db: Any = Depends(get_db)):
     try:
-        async with PatientService(current_app.db) as service:
+        async with PatientService(db) as service:
             prediction_data = await service.get_prediction(patient_id)
         
-        return jsonify({
+        return {
             'status': 'success',
             'prediction_data': prediction_data
-        }), 200
+        }
             
     except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': str(e),
-            'error_type': 'ServerError'
-        }), 500
+        raise HTTPException(
+            status_code=500,
+            detail={
+                'status': 'error',
+                'message': str(e),
+                'error_type': 'ServerError'
+            }
+        )

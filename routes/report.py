@@ -1,35 +1,47 @@
-from flask import Blueprint, jsonify, current_app
+from fastapi import APIRouter, Depends, HTTPException, Request
 from services.patient_service import PatientService
 from services.openai_service import OpenAIService
 from models.report_model import Report, ReportModel
-from utils import async_handler
 import uuid
 from datetime import datetime
+from typing import Any
 
-# Create blueprint without url_prefix
-report_bp = Blueprint('report', __name__)
+# Create router
+report_router = APIRouter(
+    prefix="/report",
+    tags=["report"]
+)
 
-@report_bp.route('/generate-report/<patient_id>', methods=['POST'])
-@async_handler
-async def generate_report(patient_id):
+# Get database from app state
+async def get_db(request: Request):
+    return request.app.state.db
+
+@report_router.post("/generate-report/{patient_id}", status_code=201)
+async def generate_report(patient_id: str, db: Any = Depends(get_db)):
     try:
-        async with PatientService(current_app.db) as service:
+        async with PatientService(db) as service:
             # Get patient prediction data
             prediction_data = await service.get_prediction(patient_id)
             # Get complete patient details
             patient_details = await service.get_patient_details(patient_id)
             
         if not prediction_data:
-            return jsonify({
-                'status': 'error',
-                'message': 'Patient prediction data not found'
-            }), 404
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    'status': 'error',
+                    'message': 'Patient prediction data not found'
+                }
+            )
 
         if not patient_details:
-            return jsonify({
-                'status': 'error',
-                'message': 'Patient details not found'
-            }), 404
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    'status': 'error',
+                    'message': 'Patient details not found'
+                }
+            )
 
         # Generate report using OpenAI
         openai_service = OpenAIService()
@@ -62,25 +74,29 @@ async def generate_report(patient_id):
         )
 
         # Save report to database
-        report_model = ReportModel(current_app.db)
+        report_model = ReportModel(db)
         await report_model.create(report_data)
 
-        return jsonify({
+        return {
             'status': 'success',
             'report': report_data.dict()
-        }), 201
+        }
 
+    except HTTPException:
+        raise
     except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        }), 500
+        raise HTTPException(
+            status_code=500,
+            detail={
+                'status': 'error',
+                'message': str(e)
+            }
+        )
 
-@report_bp.route('/reports', methods=['GET'])
-@async_handler
-async def get_all_reports():
+@report_router.get("/reports", status_code=200)
+async def get_all_reports(db: Any = Depends(get_db)):
     try:
-        report_model = ReportModel(current_app.db)
+        report_model = ReportModel(db)
         reports = await report_model.get_all_reports()
         
         # Convert ObjectId to string for JSON serialization
@@ -88,13 +104,16 @@ async def get_all_reports():
             if '_id' in report:
                 report['_id'] = str(report['_id'])
         
-        return jsonify({
+        return {
             'status': 'success',
             'reports': reports
-        }), 200
+        }
             
     except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        }), 500 
+        raise HTTPException(
+            status_code=500,
+            detail={
+                'status': 'error',
+                'message': str(e)
+            }
+        ) 

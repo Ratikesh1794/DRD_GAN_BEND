@@ -1,44 +1,53 @@
-from flask import Flask
-from flask_cors import CORS
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from config.database import DatabaseConfig
-from base import configure_routes
-from asgiref.wsgi import WsgiToAsgi
 from config.cloudinary_config import configure_cloudinary
-from utils import run_async
 import os
+import uvicorn
 
 # Load environment variables
 load_dotenv()
 
-def create_app():
-    app = Flask(__name__)
-    CORS(app, resources={
-        r"/*": {
-            "origins": "*",
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
-        }
-    })
-    
-    # Configure Cloudinary
-    configure_cloudinary()
-    
-    # Initialize database
-    db_config = DatabaseConfig()
-    app.db = run_async(db_config.connect())
-    
-    # Configure routes
-    configure_routes(app)
-    
-    return app
+app = FastAPI(
+    title="Diabetic Retinopathy API",
+    description="API for Diabetic Retinopathy Detection",
+    version="1.0.0"
+)
 
-# Create app instance
-app = create_app()
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Create ASGI app
-asgi_app = WsgiToAsgi(app)
+# Configure Cloudinary
+configure_cloudinary()
 
-if __name__ == '__main__':
+# Initialize database connection
+db_config = DatabaseConfig()
+
+@app.on_event("startup")
+async def startup_event():
+    app.state.db = await db_config.connect()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await db_config.close()
+
+# Import and include routers
+from routes.patient import patient_router
+from routes.image import image_router
+from routes.report import report_router
+
+# Include routers
+app.include_router(patient_router)
+app.include_router(image_router)
+app.include_router(report_router)
+
+if __name__ == "__main__":
     port = int(os.getenv('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)
