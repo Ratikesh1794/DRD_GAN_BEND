@@ -9,7 +9,6 @@ from typing import Any
 
 # Create router
 image_router = APIRouter(
-    prefix="/image",
     tags=["image"]
 )
 

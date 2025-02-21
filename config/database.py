@@ -1,6 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
+import certifi
 import os
 
 load_dotenv()
@@ -23,12 +24,13 @@ class DatabaseConfig:
         try:
             mongodb_uri = self.get_uri()
             
-            # Create new client with connection pooling
+            # Create new client with connection pooling and SSL certificate verification
             self.client = AsyncIOMotorClient(
                 mongodb_uri,
                 server_api=ServerApi('1'),
                 maxPoolSize=50,
-                minPoolSize=10
+                minPoolSize=10,
+                tlsCAFile=certifi.where()
             )
             
             db_name = self.get_database_name()

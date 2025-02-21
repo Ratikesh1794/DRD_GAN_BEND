@@ -8,7 +8,6 @@ from typing import Any
 
 # Create router
 report_router = APIRouter(
-    prefix="/report",
     tags=["report"]
 )
 

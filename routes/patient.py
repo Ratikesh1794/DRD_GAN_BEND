@@ -6,7 +6,6 @@ from fastapi import Request
 
 # Create router
 patient_router = APIRouter(
-    prefix="/patient",
     tags=["patient"]
 )
 
