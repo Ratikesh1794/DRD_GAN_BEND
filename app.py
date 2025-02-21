@@ -64,7 +64,7 @@ async def root():
 
 if __name__ == "__main__":
     # Get port from environment variable with a default of 10000 (Render's default)
-    port = int(os.getenv('PORT', 10000))
+    port = int(os.getenv('PORT', 8000))
     
     # Ensure host is set to 0.0.0.0 for Render deployment
     uvicorn.run(
