@@ -95,63 +95,31 @@ class OpenAIService:
             - Include quantitative data where available
             - Avoid any special characters or formatting markers
             
-            Eg :
-            Wrong format:
-            {
-                "report": {
+            Example Wrong Format:
+            {{
+                "report": {{
                     "blood_pressure": "120/80",
                     "blood_sugar_fasting": 95.5,
-                    "classification_details": "Patient Name: John Doe\nDOB: 1990-01-01\nGender: Male",
+                    "classification_details": "Patient Name: John Doe\\nDOB: 1990-01-01\\nGender: Male",
                     "confidence": 0.8788774013519287,
-                    "created_at": "Thu, 20 Feb 2025 19:18:06 GMT",
-                    "date_of_birth": "Mon, 01 Jan 1990 00:00:00 GMT",
                     "dr_status": "Positive",
                     "dr_status_analysis": "**Patient Medical Assessment**",
-                    "follow_up_plan": "**Classification Details**",
-                    "gender": "male",
-                    "image_url": "https://res.cloudinary.com/dolurenna/image/upload/v1740079032/retinal_images/patient_P12345_test.jpg",
-                    "patient_id": "P12345",
-                    "patient_medical_assessment": "**Medical Report**",
-                    "patient_name": "John Doe",
-                    "recommendations": "Retinal examination revealed a positive Diabetic Retinopathy (DR) status. The severity level of DR is graded as severe. The confidence level of the DR diagnosis is 0.9%, indicating a high degree of certainty in the diagnosis. These findings correlate with the patient's main symptom of blurred vision, which is a common manifestation of DR.",
-                    "report_id": "90a547f0-f84b-4f43-841e-2d9bdae3345f",
-                    "risk_assessment": "**DR Status Analysis**",
-                    "severity_level": "Severe DR",
-                    "vision_problems": "Blurred vision",
-                    "visual_acuity_left": 0.7,
-                    "visual_acuity_right": 0.8,
-                    "vulnerable_areas_analysis": "John Doe presents with the primary complaint of blurred vision. His visual acuity measurement is 0.8 for the right eye and 0.7 for the left eye, indicating mild vision impairment. Vital signs show a fasting blood sugar of 95.5, which is within a healthy range. Blood pressure measurement is 120/80 mmHg, classified as normal. Overall, apart from the reported vision problem, the patient's general health status appears stable."
-                },
-                "status": "success"
-            }
-            Correct Format:
-            {
-                "report": {
+                    "follow_up_plan": "**Classification Details**"
+                }}
+            }}
+
+            Example Correct Format:
+            {{
+                "report": {{
                     "blood_pressure": "120/80",
                     "blood_sugar_fasting": 95.5,
-                    "classification_details": "Patient Name: John Doe\nDOB: 1990-01-01\nGender: Male",
+                    "classification_details": "Patient Name: John Doe\\nDOB: 1990-01-01\\nGender: Male",
                     "confidence": 0.8788774013519287,
-                    "created_at": "Thu, 20 Feb 2025 19:18:06 GMT",
-                    "date_of_birth": "Mon, 01 Jan 1990 00:00:00 GMT",
                     "dr_status": "Positive",
                     "dr_status_analysis": "Patient Medical Assessment",
-                    "follow_up_plan": "Classification Details",
-                    "gender": "male",
-                    "image_url": "https://res.cloudinary.com/dolurenna/image/upload/v1740079032/retinal_images/patient_P12345_test.jpg",
-                    "patient_id": "P12345",
-                    "patient_medical_assessment": "Medical Report",
-                    "patient_name": "John Doe",
-                    "recommendations": "Retinal examination revealed a positive Diabetic Retinopathy (DR) status. The severity level of DR is graded as severe. The confidence level of the DR diagnosis is 0.9%, indicating a high degree of certainty in the diagnosis. These findings correlate with the patient's main symptom of blurred vision, which is a common manifestation of DR.",
-                    "report_id": "90a547f0-f84b-4f43-841e-2d9bdae3345f",
-                    "risk_assessment": "DR Status Analysis",
-                    "severity_level": "Severe DR",
-                    "vision_problems": "Blurred vision",
-                    "visual_acuity_left": 0.7,
-                    "visual_acuity_right": 0.8,
-                    "vulnerable_areas_analysis": "John Doe presents with the primary complaint of blurred vision. His visual acuity measurement is 0.8 for the right eye and 0.7 for the left eye, indicating mild vision impairment. Vital signs show a fasting blood sugar of 95.5, which is within a healthy range. Blood pressure measurement is 120/80 mmHg, classified as normal. Overall, apart from the reported vision problem, the patient's general health status appears stable."
-                },
-                "status": "success"
-            }
+                    "follow_up_plan": "Classification Details"
+                }}
+            }}
             """
 
             response = self.client.chat.completions.create(

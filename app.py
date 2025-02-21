@@ -32,11 +32,16 @@ db_config = DatabaseConfig()
 
 @app.on_event("startup")
 async def startup_event():
-    app.state.db = await db_config.connect()
+    try:
+        app.state.db = await db_config.connect()
+    except Exception as e:
+        print(f"Failed to initialize database: {str(e)}")
+        raise
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await db_config.close()
+    if hasattr(app.state, 'db'):
+        await db_config.close()
 
 # Import and include routers
 from routes.patient import patient_router
