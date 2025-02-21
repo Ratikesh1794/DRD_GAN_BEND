@@ -53,6 +53,23 @@ app.include_router(patient_router)
 app.include_router(image_router)
 app.include_router(report_router)
 
+# Add a root endpoint
+@app.get("/")
+async def root():
+    return {
+        "status": "success",
+        "message": "Diabetic Retinopathy Detection API is running",
+        "version": "1.0.0"
+    }
+
 if __name__ == "__main__":
-    port = int(os.getenv('PORT', 8000))
-    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)
+    # Get port from environment variable with a default of 10000 (Render's default)
+    port = int(os.getenv('PORT', 10000))
+    
+    # Ensure host is set to 0.0.0.0 for Render deployment
+    uvicorn.run(
+        "app:app", 
+        host="0.0.0.0", 
+        port=port, 
+        reload=False  # Disable reload in production
+    )
